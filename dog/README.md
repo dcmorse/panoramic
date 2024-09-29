@@ -2,7 +2,13 @@
 
 
 ## Build
+### Docker Build
+```
+docker run -i dog /bin/bash -c "npx spago bundle-app > /dev/stderr && cat index.js" > index.js
+open index.html
+```
 
+## Host System Build
 
 ```
 # tested npm 10.2.4
@@ -12,6 +18,9 @@ npx spago bundle-app
 # Imagine 'open' invokes your web browser:
 open index.html
 ```
+
+
+
 
 ## Notes
 
