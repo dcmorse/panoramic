@@ -1,23 +1,33 @@
 # Dog API SPA
 
 
-## Build
-### Docker Build
-```
-docker run -i dog /bin/bash -c "npx spago bundle-app > /dev/stderr && cat index.js" > index.js
-open index.html
-```
-
-## Host System Build
+# Development
+## dev machine build
 
 ```
-# tested npm 10.2.4
-cd <dogroot>
+# tested npm 10.2.4, 10.8.3
+cd dog
 npm ci
 npx spago bundle-app
 # Imagine 'open' invokes your web browser:
 open index.html
 ```
+
+
+
+## docker build - not tested lately
+```
+docker build -t dog .
+docker run -i dog /bin/bash -c "npx spago bundle-app > /dev/stderr && cat index.js" > index.js
+open index.html
+```
+### Development
+```
+docker run -it dog /bin/bash
+```
+From within this shell you can `spago repl` or what have you.
+
+
 
 
 

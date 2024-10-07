@@ -21,6 +21,8 @@ COPY package.json spago.dhall packages.dhall ./
 # Install npm dependencies
 RUN npm install
 
+# RUN spago install affjax
+
 # Install Spago dependencies
 RUN spago install
 
