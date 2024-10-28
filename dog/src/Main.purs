@@ -6,6 +6,7 @@ import Affjax.Web as AX
 import Affjax.ResponseFormat as AXRF
 import Data.Either (hush)
 import Data.Maybe (Maybe(..))
+import Data.Map (Map)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -17,6 +18,7 @@ import Halogen.VDom.Driver (runUI)
 -- import Web.Event.Event (Event)
 -- import Web.Event.Event as Event
 import Effect.Console (log)
+import Yoga.JSON (readJSON_)
 
 main :: Effect Unit
 main = runHalogenAff do
@@ -79,9 +81,19 @@ handleAction action = do
       -- Make the API request
       response <- H.liftAff $ AX.get AXRF.string "https://dog.ceo/api/breeds/list/all"
       
+      let maybeResponse = hush response
+
       -- Log the response
-      H.liftEffect $ log $ "API response: " <> show (hush response)
-      
+      H.liftEffect $ log $ "API response: " <> show maybeResponse
+
+      let bodyOf x = x.body
+          maybeBody :: Maybe String
+          maybeBody = bodyOf <$> maybeResponse
+          parsed :: Maybe { status :: String, message :: Map String (Array String) }
+          parsed = join (readJSON_ <$> maybeBody)
+
+      H.liftEffect $ log $ "status: " <> show parsed
+
       -- Update state based on the API response
       H.modify_ \s -> s
         { loading = false

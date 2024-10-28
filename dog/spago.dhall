@@ -20,8 +20,10 @@ to generate this file without the comments in this block.
   , "either"
   , "halogen"
   , "maybe"
+  , "ordered-collections"
   , "prelude"
   , "web-events"
+  , "yoga-json"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
