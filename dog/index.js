@@ -8606,21 +8606,21 @@
       ;
       return "";
     }())]), div_(function() {
-      if (st.result instanceof Nothing) {
+      if (st.breedMap instanceof Nothing) {
         return [text5("no st.result!")];
       }
       ;
-      if (st.result instanceof Just) {
-        return [h2_([text5("Response")]), pre_([code_([text5(st.result.value0)])])];
+      if (st.breedMap instanceof Just) {
+        return [h2_([text5("Response")]), pre_([code_([text5("blah")])])];
       }
       ;
-      throw new Error("Failed pattern match at Main (line 57, column 9 - line 64, column 14): " + [st.result.constructor.name]);
+      throw new Error("Failed pattern match at Main (line 59, column 9 - line 66, column 14): " + [st.breedMap.constructor.name]);
     }())]);
   };
   var initialState = function(v) {
     return {
       loading: false,
-      result: Nothing.value
+      breedMap: Nothing.value
     };
   };
   var handleAction = function(dictMonadAff) {
@@ -8630,21 +8630,24 @@
       return discard5(liftEffect7(log2("handleAction triggered with: " + show22(action2))))(function() {
         return discard5(liftEffect7(log2("PageLoad action triggered, setting loading to true.")))(function() {
           return discard5(modify_3(function(s) {
-            var $77 = {};
-            for (var $78 in s) {
-              if ({}.hasOwnProperty.call(s, $78)) {
-                $77[$78] = s[$78];
+            var $76 = {};
+            for (var $77 in s) {
+              if ({}.hasOwnProperty.call(s, $77)) {
+                $76[$77] = s[$77];
               }
               ;
             }
             ;
-            $77.loading = true;
-            return $77;
+            $76.loading = true;
+            return $76;
           }))(function() {
             return discard5(liftEffect7(log2("Making API request to get breed list.")))(function() {
               return bind5(liftAff2(get2(string)("https://dog.ceo/api/breeds/list/all")))(function(response) {
                 var maybeResponse = hush(response);
                 return discard5(liftEffect7(log2("API response: " + show4(maybeResponse))))(function() {
+                  var messageOf = function(x) {
+                    return x.message;
+                  };
                   var bodyOf = function(x) {
                     return x.body;
                   };
@@ -8652,19 +8655,17 @@
                   var parsed = join3(map25(readJSON_2)(maybeBody));
                   return discard5(liftEffect7(log2("status: " + show1(parsed))))(function() {
                     return discard5(modify_3(function(s) {
-                      var $80 = {};
-                      for (var $81 in s) {
-                        if ({}.hasOwnProperty.call(s, $81)) {
-                          $80[$81] = s[$81];
+                      var $79 = {};
+                      for (var $80 in s) {
+                        if ({}.hasOwnProperty.call(s, $80)) {
+                          $79[$80] = s[$80];
                         }
                         ;
                       }
                       ;
-                      $80.loading = false;
-                      $80.result = map25(function(v1) {
-                        return v1.body;
-                      })(hush(response));
-                      return $80;
+                      $79.loading = false;
+                      $79.breedMap = map25(messageOf)(parsed);
+                      return $79;
                     }))(function() {
                       return liftEffect7(log2("PageLoad action completed, loading set to false."));
                     });

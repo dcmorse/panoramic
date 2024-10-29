@@ -5,8 +5,8 @@ import Prelude
 import Affjax.Web as AX
 import Affjax.ResponseFormat as AXRF
 import Data.Either (hush)
-import Data.Maybe (Maybe(..))
-import Data.Map (Map)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Map (Map, lookup)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -25,9 +25,11 @@ main = runHalogenAff do
   body <- awaitBody
   runUI component unit body
 
+type BreedMap = Map String (Array String)
+
 type State =
   { loading :: Boolean
-  , result :: Maybe String
+  , breedMap :: Maybe BreedMap
   }
 
 data Action
@@ -46,7 +48,7 @@ component =
 
 
 initialState :: forall input. input -> State
-initialState _ = { loading: false, result: Nothing }
+initialState _ = { loading: false, breedMap: Nothing }
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render st =
@@ -54,13 +56,13 @@ render st =
     [ HH.p_
         [ HH.text $ if st.loading then "Loading..." else "" ]
     , HH.div_
-        case st.result of
+        case st.breedMap of
           Nothing -> [ HH.text "no st.result!"]
-          Just res ->
+          Just map ->
             [ HH.h2_
                 [ HH.text "Response" ]
             , HH.pre_
-                [ HH.code_ [ HH.text res ] ]
+                [ HH.code_ [ HH.text "blah" ] ]
             ]
     ]
 
@@ -87,6 +89,7 @@ handleAction action = do
       H.liftEffect $ log $ "API response: " <> show maybeResponse
 
       let bodyOf x = x.body
+          messageOf x = x.message
           maybeBody :: Maybe String
           maybeBody = bodyOf <$> maybeResponse
           parsed :: Maybe { status :: String, message :: Map String (Array String) }
@@ -97,7 +100,7 @@ handleAction action = do
       -- Update state based on the API response
       H.modify_ \s -> s
         { loading = false
-        , result = map (_.body) (hush response)  -- Only update if the response was successful
+        , breedMap = messageOf <$> parsed
         }
       
       -- Log completion of the action
