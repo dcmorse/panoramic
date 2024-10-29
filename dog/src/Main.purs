@@ -6,7 +6,8 @@ import Affjax.Web as AX
 import Affjax.ResponseFormat as AXRF
 import Data.Either (hush)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Map (Map, lookup)
+import Data.Map (Map, keys)
+import Data.Array (fromFoldable)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -50,6 +51,9 @@ component =
 initialState :: forall input. input -> State
 initialState _ = { loading: false, breedMap: Nothing }
 
+mapBreedMap :: forall b. (String -> b) -> BreedMap -> Array b
+mapBreedMap f bmap  = map f $ fromFoldable $ keys bmap
+
 render :: forall m. State -> H.ComponentHTML Action () m
 render st =
   HH.div_
@@ -58,11 +62,11 @@ render st =
     , HH.div_
         case st.breedMap of
           Nothing -> [ HH.text "no st.result!"]
-          Just map ->
+          Just bmap ->
             [ HH.h2_
                 [ HH.text "Response" ]
-            , HH.pre_
-                [ HH.code_ [ HH.text "blah" ] ]
+            , HH.ul_
+                (map (\x -> HH.li_ [x]) $ mapBreedMap HH.text bmap)
             ]
     ]
 
