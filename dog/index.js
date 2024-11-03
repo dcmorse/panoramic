@@ -185,7 +185,7 @@
     return dict.pure;
   };
   var unless = function(dictApplicative) {
-    var pure15 = pure(dictApplicative);
+    var pure16 = pure(dictApplicative);
     return function(v) {
       return function(v1) {
         if (!v) {
@@ -193,7 +193,7 @@
         }
         ;
         if (v) {
-          return pure15(unit);
+          return pure16(unit);
         }
         ;
         throw new Error("Failed pattern match at Control.Applicative (line 68, column 1 - line 68, column 65): " + [v.constructor.name, v1.constructor.name]);
@@ -201,7 +201,7 @@
     };
   };
   var when = function(dictApplicative) {
-    var pure15 = pure(dictApplicative);
+    var pure16 = pure(dictApplicative);
     return function(v) {
       return function(v1) {
         if (v) {
@@ -209,7 +209,7 @@
         }
         ;
         if (!v) {
-          return pure15(unit);
+          return pure16(unit);
         }
         ;
         throw new Error("Failed pattern match at Control.Applicative (line 63, column 1 - line 63, column 63): " + [v.constructor.name, v1.constructor.name]);
@@ -218,10 +218,10 @@
   };
   var liftA1 = function(dictApplicative) {
     var apply4 = apply(dictApplicative.Apply0());
-    var pure15 = pure(dictApplicative);
+    var pure16 = pure(dictApplicative);
     return function(f) {
       return function(a2) {
-        return apply4(pure15(f))(a2);
+        return apply4(pure16(f))(a2);
       };
     };
   };
@@ -1041,12 +1041,12 @@
   };
   var ap = function(dictMonad) {
     var bind6 = bind(dictMonad.Bind1());
-    var pure15 = pure(dictMonad.Applicative0());
+    var pure16 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a2) {
         return bind6(f)(function(f$prime) {
           return bind6(a2)(function(a$prime) {
-            return pure15(f$prime(a$prime));
+            return pure16(f$prime(a$prime));
           });
         });
       };
@@ -1163,10 +1163,10 @@
     var catchError1 = catchError(dictMonadError);
     var Monad0 = dictMonadError.MonadThrow0().Monad0();
     var map26 = map(Monad0.Bind1().Apply0().Functor0());
-    var pure15 = pure(Monad0.Applicative0());
+    var pure16 = pure(Monad0.Applicative0());
     return function(a2) {
       return catchError1(map26(Right.create)(a2))(function($52) {
-        return pure15(Left.create($52));
+        return pure16(Left.create($52));
       });
     };
   };
@@ -1547,12 +1547,12 @@
   };
   var bindExceptT = function(dictMonad) {
     var bind6 = bind(dictMonad.Bind1());
-    var pure15 = pure(dictMonad.Applicative0());
+    var pure16 = pure(dictMonad.Applicative0());
     return {
       bind: function(v) {
         return function(k) {
           return bind6(v)(either(function($193) {
-            return pure15(Left.create($193));
+            return pure16(Left.create($193));
           })(function(a2) {
             var v1 = k(a2);
             return v1;
@@ -1605,24 +1605,24 @@
     return function(dictMonad) {
       var Bind1 = dictMonad.Bind1();
       var bind6 = bind(Bind1);
-      var pure15 = pure(dictMonad.Applicative0());
+      var pure16 = pure(dictMonad.Applicative0());
       var functorExceptT1 = functorExceptT(Bind1.Apply0().Functor0());
       return {
         alt: function(v) {
           return function(v1) {
             return bind6(v)(function(rm) {
               if (rm instanceof Right) {
-                return pure15(new Right(rm.value0));
+                return pure16(new Right(rm.value0));
               }
               ;
               if (rm instanceof Left) {
                 return bind6(v1)(function(rn) {
                   if (rn instanceof Right) {
-                    return pure15(new Right(rn.value0));
+                    return pure16(new Right(rn.value0));
                   }
                   ;
                   if (rn instanceof Left) {
-                    return pure15(new Left(append6(rm.value0)(rn.value0)));
+                    return pure16(new Left(append6(rm.value0)(rn.value0)));
                   }
                   ;
                   throw new Error("Failed pattern match at Control.Monad.Except.Trans (line 87, column 9 - line 89, column 49): " + [rn.constructor.name]);
@@ -1917,13 +1917,13 @@
   };
   var traverse_ = function(dictApplicative) {
     var applySecond2 = applySecond(dictApplicative.Apply0());
-    var pure15 = pure(dictApplicative);
+    var pure16 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr22 = foldr(dictFoldable);
       return function(f) {
         return foldr22(function($454) {
           return applySecond2(f($454));
-        })(pure15(unit));
+        })(pure16(unit));
       };
     };
   };
@@ -2091,13 +2091,13 @@
     }
     return function(apply4) {
       return function(map26) {
-        return function(pure15) {
+        return function(pure16) {
           return function(f) {
             return function(array) {
               function go2(bot, top2) {
                 switch (top2 - bot) {
                   case 0:
-                    return pure15([]);
+                    return pure16([]);
                   case 1:
                     return map26(array1)(f(array[bot]));
                   case 2:
@@ -4271,11 +4271,11 @@
     };
   };
   var readArray = function(dictMonad) {
-    var pure15 = pure(applicativeExceptT(dictMonad));
+    var pure16 = pure(applicativeExceptT(dictMonad));
     var fail1 = fail(dictMonad);
     return function(value13) {
       if (isArray(value13)) {
-        return pure15(unsafeFromForeign(value13));
+        return pure16(unsafeFromForeign(value13));
       }
       ;
       if (otherwise) {
@@ -4286,12 +4286,12 @@
     };
   };
   var unsafeReadTagged = function(dictMonad) {
-    var pure15 = pure(applicativeExceptT(dictMonad));
+    var pure16 = pure(applicativeExceptT(dictMonad));
     var fail1 = fail(dictMonad);
     return function(tag) {
       return function(value13) {
         if (tagOf(value13) === tag) {
-          return pure15(unsafeFromForeign(value13));
+          return pure16(unsafeFromForeign(value13));
         }
         ;
         if (otherwise) {
@@ -6527,7 +6527,7 @@
     return Lift.create;
   }();
   var goLeft = function(dictApplicative) {
-    var pure15 = pure(dictApplicative);
+    var pure16 = pure(dictApplicative);
     return function(fStack) {
       return function(valStack) {
         return function(nat) {
@@ -6535,7 +6535,7 @@
             return function(count) {
               if (func instanceof Pure) {
                 return new Tuple(new Cons({
-                  func: pure15(func.value0),
+                  func: pure16(func.value0),
                   count
                 }, fStack), valStack);
               }
@@ -6606,7 +6606,7 @@
   };
   var foldFreeAp = function(dictApplicative) {
     var goApply1 = goApply(dictApplicative);
-    var pure15 = pure(dictApplicative);
+    var pure16 = pure(dictApplicative);
     var goLeft1 = goLeft(dictApplicative);
     return function(nat) {
       return function(z) {
@@ -6615,7 +6615,7 @@
           var $tco_result;
           function $tco_loop(v) {
             if (v.value1.value0 instanceof Pure) {
-              var v1 = goApply1(v.value0)(v.value1.value1)(pure15(v.value1.value0.value0));
+              var v1 = goApply1(v.value0)(v.value1.value1)(pure16(v.value1.value0.value0));
               if (v1 instanceof Left) {
                 $tco_done = true;
                 return v1.value0;
@@ -7039,13 +7039,13 @@
   var foldFree = function(dictMonadRec) {
     var Monad0 = dictMonadRec.Monad0();
     var map112 = map(Monad0.Bind1().Apply0().Functor0());
-    var pure15 = pure(Monad0.Applicative0());
+    var pure16 = pure(Monad0.Applicative0());
     var tailRecM4 = tailRecM(dictMonadRec);
     return function(k) {
       var go2 = function(f) {
         var v = toView(f);
         if (v instanceof Return) {
-          return map112(Done.create)(pure15(v.value0));
+          return map112(Done.create)(pure16(v.value0));
         }
         ;
         if (v instanceof Bind) {
@@ -8424,10 +8424,10 @@
   // output/Foreign.Index/index.js
   var unsafeReadProp = function(dictMonad) {
     var fail4 = fail(dictMonad);
-    var pure15 = pure(applicativeExceptT(dictMonad));
+    var pure16 = pure(applicativeExceptT(dictMonad));
     return function(k) {
       return function(value13) {
-        return unsafeReadPropImpl(fail4(new TypeMismatch("object", typeOf(value13))), pure15, k, value13);
+        return unsafeReadPropImpl(fail4(new TypeMismatch("object", typeOf(value13))), pure16, k, value13);
       };
     };
   };
@@ -8721,6 +8721,7 @@
   // output/Main/index.js
   var map25 = /* @__PURE__ */ map(functorArray);
   var fromFoldable4 = /* @__PURE__ */ fromFoldable(foldableSet);
+  var pure15 = /* @__PURE__ */ pure(applicativeArray);
   var discard5 = /* @__PURE__ */ discard(discardUnit)(bindHalogenM);
   var modify_3 = /* @__PURE__ */ modify_2(monadStateHalogenM);
   var bind5 = /* @__PURE__ */ bind(bindHalogenM);
@@ -8783,9 +8784,11 @@
       }
       ;
       if (st.breedMap instanceof Just) {
-        return [h2_([text5("Response")]), ul_(map25(function(x) {
-          return li_([x]);
-        })(mapBreedMap(text5)(st.breedMap.value0)))];
+        return [h2_([text5("Response")]), ul_(map25(function($86) {
+          return li_(pure15($86));
+        })(mapBreedMap(function($87) {
+          return div_(pure15(text5($87)));
+        })(st.breedMap.value0)))];
       }
       ;
       throw new Error("Failed pattern match at Main (line 63, column 9 - line 70, column 14): " + [st.breedMap.constructor.name]);
@@ -8804,16 +8807,16 @@
       return discard5(liftEffect7(log2("handleAction triggered with: " + show22(action2))))(function() {
         return discard5(liftEffect7(log2("PageLoad action triggered, setting loading to true.")))(function() {
           return discard5(modify_3(function(s) {
-            var $78 = {};
-            for (var $79 in s) {
-              if ({}.hasOwnProperty.call(s, $79)) {
-                $78[$79] = s[$79];
+            var $80 = {};
+            for (var $81 in s) {
+              if ({}.hasOwnProperty.call(s, $81)) {
+                $80[$81] = s[$81];
               }
               ;
             }
             ;
-            $78.loading = true;
-            return $78;
+            $80.loading = true;
+            return $80;
           }))(function() {
             return discard5(liftEffect7(log2("Making API request to get breed list.")))(function() {
               return bind5(liftAff2(get2(string)("https://dog.ceo/api/breeds/list/all")))(function(response) {
@@ -8829,17 +8832,17 @@
                   var parsed = join3(map111(readJSON_2)(maybeBody));
                   return discard5(liftEffect7(log2("status: " + show1(parsed))))(function() {
                     return discard5(modify_3(function(s) {
-                      var $81 = {};
-                      for (var $82 in s) {
-                        if ({}.hasOwnProperty.call(s, $82)) {
-                          $81[$82] = s[$82];
+                      var $83 = {};
+                      for (var $84 in s) {
+                        if ({}.hasOwnProperty.call(s, $84)) {
+                          $83[$84] = s[$84];
                         }
                         ;
                       }
                       ;
-                      $81.loading = false;
-                      $81.breedMap = map111(messageOf)(parsed);
-                      return $81;
+                      $83.loading = false;
+                      $83.breedMap = map111(messageOf)(parsed);
+                      return $83;
                     }))(function() {
                       return liftEffect7(log2("PageLoad action completed, loading set to false."));
                     });

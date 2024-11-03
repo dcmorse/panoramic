@@ -5,7 +5,7 @@ import Prelude
 import Affjax.Web as AX
 import Affjax.ResponseFormat as AXRF
 import Data.Either (hush)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..))
 import Data.Map (Map, keys)
 import Data.Array (fromFoldable)
 import Effect (Effect)
@@ -66,7 +66,7 @@ render st =
             [ HH.h2_
                 [ HH.text "Response" ]
             , HH.ul_
-                (map (\x -> HH.li_ [x]) $ mapBreedMap HH.text bmap)
+                (map (HH.li_ <<< pure) $ mapBreedMap (HH.div_ <<< pure <<< HH.text) bmap)
             ]
     ]
 
