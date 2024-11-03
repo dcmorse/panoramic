@@ -23,6 +23,7 @@ to generate this file without the comments in this block.
   , "maybe"
   , "ordered-collections"
   , "prelude"
+  , "tuples"
   , "web-events"
   , "yoga-json"
   ]

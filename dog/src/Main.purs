@@ -1,13 +1,13 @@
 module Main where
 
 import Prelude
-
 import Affjax.Web as AX
 import Affjax.ResponseFormat as AXRF
 import Data.Either (hush)
 import Data.Maybe (Maybe(..))
-import Data.Map (Map, keys)
-import Data.Array (fromFoldable)
+import Data.Map (Map, keys, toUnfoldable)
+import Data.Array (fromFoldable, (:))
+import Data.Tuple (Tuple(..), uncurry)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -27,6 +27,12 @@ main = runHalogenAff do
   runUI component unit body
 
 type BreedMap = Map String (Array String)
+
+mapBreedMap :: forall b. (String -> Array String -> b) -> BreedMap -> Array b
+mapBreedMap f bmap = map (uncurry f) alist
+  where
+    alist :: Array (Tuple String (Array String))
+    alist = toUnfoldable bmap
 
 type State =
   { loading :: Boolean
@@ -51,9 +57,6 @@ component =
 initialState :: forall input. input -> State
 initialState _ = { loading: false, breedMap: Nothing }
 
-mapBreedMap :: forall b. (String -> b) -> BreedMap -> Array b
-mapBreedMap f bmap  = map f $ fromFoldable $ keys bmap
-
 render :: forall m. State -> H.ComponentHTML Action () m
 render st =
   HH.div_
@@ -66,9 +69,13 @@ render st =
             [ HH.h2_
                 [ HH.text "Response" ]
             , HH.ul_
-                (map (HH.li_ <<< pure) $ mapBreedMap (HH.div_ <<< pure <<< HH.text) bmap)
+                (map (HH.li_ <<< pure) $ mapBreedMap breedHtml bmap)
             ]
     ]
+  where
+    breedHtml breed subbreeds = HH.div_ $ HH.text (breed <> maybeColon subbreeds) : map (HH.text <<< (\x -> " " <> x)) subbreeds
+    maybeColon [] = ""
+    maybeColon _ = ":"
 
 handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action () output m Unit
 handleAction action = do
