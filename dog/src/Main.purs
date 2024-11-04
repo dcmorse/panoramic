@@ -27,16 +27,16 @@ main = runHalogenAff do
   runUI component unit body
 
 type Breed = String
-type BreedMap = Map.Map Breed (Array Breed)
+type IndexBreedMap = Map.Map Breed (Array Breed)
 
-mapBreedMap :: forall b. (Breed -> Array Breed -> b) -> BreedMap -> Array b
-mapBreedMap f bmap = map (uncurry f) alist
+mapIndexBreedMap :: forall b. (Breed -> Array Breed -> b) -> IndexBreedMap -> Array b
+mapIndexBreedMap f bmap = map (uncurry f) alist
   where
     alist :: Array (Tuple Breed (Array Breed))
     alist = Map.toUnfoldable bmap
 
 type State =
-  { breedMap :: Maybe BreedMap
+  { indexBreedMap :: Maybe IndexBreedMap
   }
 
 data Action
@@ -57,21 +57,21 @@ component =
 
 
 initialState :: forall input. input -> State
-initialState _ = { breedMap: Nothing }
+initialState _ = { indexBreedMap: Nothing }
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render st =
   HH.div_
     [ HH.p_
-        [ HH.text $ if isNothing st.breedMap then "Loading..." else "" ]
+        [ HH.text $ if isNothing st.indexBreedMap then "Loading..." else "" ]
     , HH.div_
-        case st.breedMap of
+        case st.indexBreedMap of
           Nothing -> [ HH.text "no st.result!"]
           Just bmap ->
             [ HH.h2_
                 [ HH.text "Response" ]
             , HH.ul_
-                (map (HH.li_ <<< pure) $ mapBreedMap breedHtml bmap)
+                (map (HH.li_ <<< pure) $ mapIndexBreedMap breedHtml bmap)
             ]
     ]
   where
@@ -113,9 +113,9 @@ handleAction action = do
 
       -- Update state based on the API response
       H.modify_ \s -> s
-        { breedMap = messageOf <$> parsed
+        { indexBreedMap = messageOf <$> parsed
         }
       
       -- Log completion of the action
-      H.liftEffect $ log "IndexLoad action completed, breedMap is a Just Map"
+      H.liftEffect $ log "IndexLoad action completed, indexBreedMap is a Just Map"
 
