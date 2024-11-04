@@ -71,7 +71,7 @@ render st =
         HH.h1_ [ HH.text breed ] : 
         case Map.lookup breed st.breedImages of
           Just (Just urls) -> map (\url -> HH.img [ HP.src url, style]) (take 20 urls)
-            where style = HP.style "max-width: 500px; max-height: 500px; width: auto; height: auto"
+            where style = HP.style "max-width: 300px; max-height: 300px; width: auto; height: auto"
           Just Nothing -> [ HH.text "Loading image list..." ]
           Nothing -> [ HH.text "Not yet loading image list (this seems like a bug)..." ]
     Nothing ->
@@ -82,8 +82,8 @@ render st =
             case st.indexBreedMap of
               Nothing -> [ HH.text "no st.result!"]
               Just bmap ->
-                [ HH.h2_
-                    [ HH.text "Response" ]
+                [ HH.h1_
+                    [ HH.text "Choose Your Dog Breed" ]
                 , HH.ul_
                     (map (HH.li_ <<< pure) $ mapIndexBreedMap breedHtml bmap)
                 ]
