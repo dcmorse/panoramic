@@ -26,6 +26,8 @@ main = runHalogenAff do
   body <- awaitBody
   runUI component unit body
 
+type Url = String
+
 type Breed = String
 type IndexBreedMap = Map.Map Breed (Array Breed)
 
@@ -36,7 +38,8 @@ mapIndexBreedMap f bmap = map (uncurry f) alist
     alist = Map.toUnfoldable bmap
 
 type State =
-  { indexBreedMap :: Maybe IndexBreedMap
+  { indexBreedMap :: Maybe IndexBreedMap,
+    breedImages :: Map.Map Breed (Maybe (Array Url)) -- if not in map: never requested. If in map with value Nothing: requested but loading, otherwise loaded
   }
 
 data Action
@@ -57,7 +60,7 @@ component =
 
 
 initialState :: forall input. input -> State
-initialState _ = { indexBreedMap: Nothing }
+initialState _ = { indexBreedMap: Nothing, breedImages: Map.empty }
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render st =
@@ -85,8 +88,19 @@ handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action
 handleAction action = do
   H.liftEffect $ log $ "handleAction triggered with: " <> show action
   case action of
-    ViewBreed b -> do
-      H.modify_ identity
+    ViewBreed breed -> do
+      st <- H.get
+      let
+        ensureLoading Nothing = Just Nothing
+        ensureLoading x@(Just _) = x
+      H.modify_ \s -> s { breedImages = Map.alter ensureLoading breed s.breedImages }
+      case (Map.lookup breed st.breedImages) of
+        Nothing -> do
+          H.liftEffect $ log $ "cache miss for " <> breed
+          response <- H.liftAff $ AX.get AXRF.string $ "https://dog.ceo/api/breed/" <> breed <> "/images"
+          H.liftEffect $ log $ "API response: " <> show (hush response)
+        Just _ -> do
+          H.liftEffect $ log $ "cache hit for " <> breed
     IndexLoad -> do
       -- Log page load event
       H.liftEffect $ log "IndexLoad action triggered"
