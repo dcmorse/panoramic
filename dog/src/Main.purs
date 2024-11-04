@@ -70,7 +70,8 @@ render st =
       HH.div_ $
         HH.h1_ [ HH.text breed ] : 
         case Map.lookup breed st.breedImages of
-          Just (Just urls) -> map (\url -> HH.img [ HP.src url ]) (take 20 urls)
+          Just (Just urls) -> map (\url -> HH.img [ HP.src url, style]) (take 20 urls)
+            where style = HP.style "max-width: 500px; max-height: 500px; width: auto; height: auto"
           Just Nothing -> [ HH.text "Loading image list..." ]
           Nothing -> [ HH.text "Not yet loading image list (this seems like a bug)..." ]
     Nothing ->
@@ -122,7 +123,8 @@ handleAction action = do
               images :: Maybe (Array Url)
               images = messageOf <$> parsed
               updateEntry Nothing = Just images
-              updateEntry mysteriouslyPreCachedImages = mysteriouslyPreCachedImages
+              updateEntry (Just Nothing) = Just images
+              updateEntry x = x -- hm we double GET'ted. Peformance bug. 
           H.liftEffect $ log $ "updating image cache urls for " <> breed
           H.modify_ \s -> s { breedImages = Map.alter updateEntry breed s.breedImages }      
         Just _ -> do
