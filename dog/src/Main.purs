@@ -26,16 +26,18 @@ main = runHalogenAff do
   body <- awaitBody
   runUI component unit body
 
-type BreedMap = Map.Map String (Array String)
+type Breed = String
+type BreedMap = Map.Map Breed (Array Breed)
 
-mapBreedMap :: forall b. (String -> Array String -> b) -> BreedMap -> Array b
+mapBreedMap :: forall b. (Breed -> Array Breed -> b) -> BreedMap -> Array b
 mapBreedMap f bmap = map (uncurry f) alist
   where
-    alist :: Array (Tuple String (Array String))
+    alist :: Array (Tuple Breed (Array Breed))
     alist = Map.toUnfoldable bmap
 
 type State =
-  { breedMap :: Maybe BreedMap }
+  { breedMap :: Maybe BreedMap
+  }
 
 data Action
   = IndexLoad
@@ -104,7 +106,7 @@ handleAction action = do
           messageOf x = x.message
           maybeBody :: Maybe String
           maybeBody = bodyOf <$> maybeResponse
-          parsed :: Maybe { status :: String, message :: Map.Map String (Array String) }
+          parsed :: Maybe { status :: String, message :: Map.Map Breed (Array Breed) }
           parsed = join (readJSON_ <$> maybeBody)
 
       H.liftEffect $ log $ "status: " <> show parsed
