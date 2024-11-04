@@ -4,7 +4,7 @@ import Prelude
 import Affjax.Web as AX
 import Affjax.ResponseFormat as AXRF
 import Data.Either (hush)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), isNothing)
 import Data.Map as Map
 import Data.Array (fromFoldable, (:))
 import Data.Tuple (Tuple(..), uncurry)
@@ -35,9 +35,7 @@ mapBreedMap f bmap = map (uncurry f) alist
     alist = Map.toUnfoldable bmap
 
 type State =
-  { loading :: Boolean
-  , breedMap :: Maybe BreedMap
-  }
+  { breedMap :: Maybe BreedMap }
 
 data Action
   = IndexLoad
@@ -57,13 +55,13 @@ component =
 
 
 initialState :: forall input. input -> State
-initialState _ = { loading: false, breedMap: Nothing }
+initialState _ = { breedMap: Nothing }
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render st =
   HH.div_
     [ HH.p_
-        [ HH.text $ if st.loading then "Loading..." else "" ]
+        [ HH.text $ if isNothing st.breedMap then "Loading..." else "" ]
     , HH.div_
         case st.breedMap of
           Nothing -> [ HH.text "no st.result!"]
@@ -89,10 +87,7 @@ handleAction action = do
       H.modify_ identity
     IndexLoad -> do
       -- Log page load event
-      H.liftEffect $ log "IndexLoad action triggered, setting loading to true."
-      
-      -- Set loading state to true
-      H.modify_ \s -> s { loading = true }
+      H.liftEffect $ log "IndexLoad action triggered"
       
       -- Log that the API request is being made
       H.liftEffect $ log "Making API request to get breed list."
@@ -116,10 +111,9 @@ handleAction action = do
 
       -- Update state based on the API response
       H.modify_ \s -> s
-        { loading = false
-        , breedMap = messageOf <$> parsed
+        { breedMap = messageOf <$> parsed
         }
       
       -- Log completion of the action
-      H.liftEffect $ log "IndexLoad action completed, loading set to false."
+      H.liftEffect $ log "IndexLoad action completed, breedMap is a Just Map"
 
