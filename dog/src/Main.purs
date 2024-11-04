@@ -13,7 +13,7 @@ import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.Aff (awaitBody, runHalogenAff)
 import Halogen.HTML as HH
--- import Halogen.HTML.Events as HE
+import Halogen.HTML.Events as HE
 -- import Halogen.HTML.Properties as HP
 import Halogen.VDom.Driver (runUI)
 -- import Web.Event.Event (Event)
@@ -40,17 +40,19 @@ type State =
   }
 
 data Action
-  = PageLoad
+  = IndexLoad
+  | ViewBreed String
 
 instance showAction :: Show Action where
-  show PageLoad = "PageLoad"
+  show IndexLoad = "IndexLoad"
+  show (ViewBreed breed) = "ViewBreed " <> show breed
 
 component :: forall query input output m. MonadAff m => H.Component query input output m
 component =
   H.mkComponent
     { initialState
     , render
-    , eval: H.mkEval $ H.defaultEval { handleAction = handleAction, initialize = Just PageLoad }
+    , eval: H.mkEval $ H.defaultEval { handleAction = handleAction, initialize = Just IndexLoad }
     }
 
 
@@ -73,17 +75,21 @@ render st =
             ]
     ]
   where
-    breedHtml breed subbreeds = HH.div_ $ HH.text (breed <> maybeColon subbreeds) : map (HH.text <<< (\x -> " " <> x)) subbreeds
-    maybeColon [] = ""
-    maybeColon _ = ":"
+    breedHtml breed subbreeds = HH.div_ $ [breedLink breed] <> colon subbreeds <> map (HH.text <<< (\x -> " " <> x)) subbreeds
+    colon [] = []
+    colon _ = [HH.text ":"]
+    breedLink s = HH.a [ HE.onClick \_ -> ViewBreed s, HH.attr (HH.AttrName "href") "#" ] [ HH.text s ]
+    
 
 handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action () output m Unit
 handleAction action = do
   H.liftEffect $ log $ "handleAction triggered with: " <> show action
   case action of
-    PageLoad -> do
+    ViewBreed b -> do
+      H.modify_ identity
+    IndexLoad -> do
       -- Log page load event
-      H.liftEffect $ log "PageLoad action triggered, setting loading to true."
+      H.liftEffect $ log "IndexLoad action triggered, setting loading to true."
       
       -- Set loading state to true
       H.modify_ \s -> s { loading = true }
@@ -115,5 +121,5 @@ handleAction action = do
         }
       
       -- Log completion of the action
-      H.liftEffect $ log "PageLoad action completed, loading set to false."
+      H.liftEffect $ log "IndexLoad action completed, loading set to false."
 
