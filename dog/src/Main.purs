@@ -5,7 +5,7 @@ import Affjax.Web as AX
 import Affjax.ResponseFormat as AXRF
 import Data.Either (hush)
 import Data.Maybe (Maybe(..))
-import Data.Map (Map, keys, toUnfoldable)
+import Data.Map as Map
 import Data.Array (fromFoldable, (:))
 import Data.Tuple (Tuple(..), uncurry)
 import Effect (Effect)
@@ -26,13 +26,13 @@ main = runHalogenAff do
   body <- awaitBody
   runUI component unit body
 
-type BreedMap = Map String (Array String)
+type BreedMap = Map.Map String (Array String)
 
 mapBreedMap :: forall b. (String -> Array String -> b) -> BreedMap -> Array b
 mapBreedMap f bmap = map (uncurry f) alist
   where
     alist :: Array (Tuple String (Array String))
-    alist = toUnfoldable bmap
+    alist = Map.toUnfoldable bmap
 
 type State =
   { loading :: Boolean
@@ -109,7 +109,7 @@ handleAction action = do
           messageOf x = x.message
           maybeBody :: Maybe String
           maybeBody = bodyOf <$> maybeResponse
-          parsed :: Maybe { status :: String, message :: Map String (Array String) }
+          parsed :: Maybe { status :: String, message :: Map.Map String (Array String) }
           parsed = join (readJSON_ <$> maybeBody)
 
       H.liftEffect $ log $ "status: " <> show parsed
