@@ -46,10 +46,12 @@ type State =
 data Action
   = IndexLoad
   | ViewBreed String
+  | ViewIndex
 
 instance showAction :: Show Action where
   show IndexLoad = "IndexLoad"
   show (ViewBreed breed) = "ViewBreed " <> show breed
+  show ViewIndex = "ViewIndex"
 
 component :: forall query input output m. MonadAff m => H.Component query input output m
 component =
@@ -68,12 +70,13 @@ render st =
   case st.route of
     Just breed ->
       HH.div_ $
-        HH.h1_ [ HH.text breed ] : 
+        [ HH.a [ HE.onClick \_ -> ViewIndex, HH.attr (HH.AttrName "href") "#" ] [ HH.text "all dog breeds" ],
+          HH.h1_ [ HH.text breed ] ] <>
         case Map.lookup breed st.breedImages of
           Just (Just urls) -> map (\url -> HH.img [ HP.src url, style]) (take 20 urls)
             where style = HP.style "max-width: 300px; max-height: 300px; width: auto; height: auto"
           Just Nothing -> [ HH.text "Loading image list..." ]
-          Nothing -> [ HH.text "Not yet loading image list (this seems like a bug)..." ]
+          Nothing -> [ HH.text "Not yet loading image list (seeing this seems like a bug)..." ]
     Nothing ->
       HH.div_
         [ HH.p_
@@ -105,6 +108,8 @@ handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action
 handleAction action = do
   H.liftEffect $ log $ "handleAction triggered with: " <> show action
   case action of
+    ViewIndex -> do
+      H.modify_ \s -> s { route = Nothing }
     ViewBreed breed -> do
       st <- H.get
       let
