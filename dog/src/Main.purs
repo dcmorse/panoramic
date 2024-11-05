@@ -6,7 +6,7 @@ import Affjax.ResponseFormat as AXRF
 import Data.Either (hush)
 import Data.Maybe (Maybe(..), isNothing)
 import Data.Map as Map
-import Data.Array ((:), take)
+import Data.Array (slice, length)
 import Data.Tuple (Tuple, uncurry)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
@@ -40,18 +40,23 @@ mapIndexBreedMap f bmap = map (uncurry f) alist
 type State =
   { indexBreedMap :: Maybe IndexBreedMap,
     breedImages :: Map.Map Breed (Maybe (Array Url)), -- if not in map: never requested. If in map with value Nothing: requested but loading, otherwise loaded
-    route :: Maybe Breed -- 'Nothing' means the index page
+    route :: Maybe Breed, -- 'Nothing' means the index page
+    paginationOffset :: Int
   }
 
 data Action
   = IndexLoad
   | ViewBreed String
   | ViewIndex
+  | PageDecrement
+  | PageIncrement
 
 instance showAction :: Show Action where
   show IndexLoad = "IndexLoad"
   show (ViewBreed breed) = "ViewBreed " <> show breed
   show ViewIndex = "ViewIndex"
+  show PageDecrement = "PageDecrement"
+  show PageIncrement = "PageIncrement"
 
 component :: forall query input output m. MonadAff m => H.Component query input output m
 component =
@@ -63,7 +68,11 @@ component =
 
 
 initialState :: forall input. input -> State
-initialState _ = { indexBreedMap: Nothing, breedImages: Map.empty, route: Nothing }
+initialState _ = { indexBreedMap: Nothing,
+                   breedImages: Map.empty,
+                   route: Nothing,
+                   paginationOffset: 0
+                 }
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render st =
@@ -73,8 +82,15 @@ render st =
         [ HH.a [ HE.onClick \_ -> ViewIndex, HH.attr (HH.AttrName "href") "#" ] [ HH.text "all dog breeds" ],
           HH.h1_ [ HH.text breed ] ] <>
         case Map.lookup breed st.breedImages of
-          Just (Just urls) -> map (\url -> HH.img [ HP.src url, style]) (take 20 urls)
-            where style = HP.style "max-width: 300px; max-height: 300px; width: auto; height: auto"
+          Just (Just urls) -> navbar <> images
+            where
+              images = map (\url -> HH.img [ HP.src url, style]) (slice offset (offset+20) urls)
+              offset = st.paginationOffset
+              style = HP.style "max-width: 300px; max-height: 300px; width: auto; height: auto"
+              navbar = [ HH.div_ [ prevPage, numberOfImagesText, nextPage ] ]
+              numberOfImagesText = HH.text $ " " <> show (length urls) <> " images "
+              prevPage = HH.button [ HE.onClick \_ -> PageDecrement ] [ HH.text "<page" ]
+              nextPage = HH.button [ HE.onClick \_ -> PageIncrement ] [ HH.text "page>" ]
           Just Nothing -> [ HH.text "Loading image list..." ]
           Nothing -> [ HH.text "Not yet loading image list (seeing this seems like a bug)..." ]
     Nothing ->
@@ -106,10 +122,15 @@ messageOf x = x.message
 
 handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action () output m Unit
 handleAction action = do
-  H.liftEffect $ log $ "handleAction triggered with: " <> show action
+  removeMe <- H.get
+  H.liftEffect $ log $ "handleAction triggered with: " <> show action <> " offset = " <> show removeMe.paginationOffset
   case action of
+    PageDecrement -> do
+      H.modify_ \s -> s { paginationOffset = s.paginationOffset - 20 }
+    PageIncrement -> do
+      H.modify_ \s -> s { paginationOffset = s.paginationOffset + 20 }
     ViewIndex -> do
-      H.modify_ \s -> s { route = Nothing }
+      H.modify_ \s -> s { route = Nothing, paginationOffset = 0 }
     ViewBreed breed -> do
       st <- H.get
       let
