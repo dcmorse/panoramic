@@ -89,8 +89,8 @@ render st =
               style = HP.style "max-width: 300px; max-height: 300px; width: auto; height: auto"
               navbar = [ HH.div_ [ prevPage, numberOfImagesText, nextPage ] ]
               numberOfImagesText = HH.text $ " " <> show (length urls) <> " images "
-              prevPage = HH.button [ HE.onClick \_ -> PageDecrement ] [ HH.text "<page" ]
-              nextPage = HH.button [ HE.onClick \_ -> PageIncrement ] [ HH.text "page>" ]
+              prevPage = HH.button [ HE.onClick \_ -> PageDecrement, HP.disabled (offset <= 0) ] [ HH.text "<page" ]
+              nextPage = HH.button [ HE.onClick \_ -> PageIncrement, HP.disabled (offset + 20 >= length urls) ] [ HH.text "page>" ]
           Just Nothing -> [ HH.text "Loading image list..." ]
           Nothing -> [ HH.text "Not yet loading image list (seeing this seems like a bug)..." ]
     Nothing ->
