@@ -86,7 +86,7 @@ render st =
             where
               images = map (\url -> HH.img [ HP.src url, style]) (slice offset (offset+20) urls)
               offset = st.paginationOffset
-              style = HP.style "max-width: 300px; max-height: 300px; width: auto; height: auto"
+              style = HP.style "max-width: 250px; max-height: 300px; height: auto"
               navbar = [ HH.div_ [ prevPage, numberOfImagesText, nextPage ] ]
               numberOfImagesText = HH.text $ " " <> show (length urls) <> " images "
               prevPage = HH.button [ HE.onClick \_ -> PageDecrement, HP.disabled (offset <= 0) ] [ HH.text "<page" ]
