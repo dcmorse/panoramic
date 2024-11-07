@@ -82,12 +82,13 @@ render st =
         [ HH.a [ HE.onClick \_ -> ViewIndex, HH.attr (HH.AttrName "href") "#" ] [ HH.text "all dog breeds" ],
           HH.h1_ [ HH.text breed ] ] <>
         case Map.lookup breed st.breedImages of
-          Just (Just urls) -> navbar <> images
+          Just (Just urls) -> navbar <> imagesContainer
             where
+              imagesContainer = [ HH.div [ HP.style "display: flex; flex-wrap: wrap; justify-content: space-between; gap: 30px 10px" ] images ]
               images = map (\url -> HH.img [ HP.src url, style]) (slice offset (offset+20) urls)
               offset = st.paginationOffset
-              style = HP.style "max-width: 250px; max-height: 300px; height: auto"
-              navbar = [ HH.div_ [ prevPage, numberOfImagesText, nextPage ] ]
+              style = HP.style "max-height: 200px; width: auto"
+              navbar = [ HH.div [ HP.style "margin-bottom: 30px" ] [ prevPage, numberOfImagesText, nextPage ] ]
               numberOfImagesText = HH.text $ " " <> show (length urls) <> " " <> imagesText <> " "
               prevPage = HH.button [ HE.onClick \_ -> PageDecrement, HP.disabled (offset <= 0) ] [ HH.text "<page" ]
               nextPage = HH.button [ HE.onClick \_ -> PageIncrement, HP.disabled (offset + 20 >= length urls) ] [ HH.text "page>" ]
