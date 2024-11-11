@@ -24,7 +24,7 @@ objective of working on this application, so please go for it!
 Open index.html in your web browser.
 
 ![The Breed List](breed-list.png)
-![The Breed Details](breed-details.png)
+![The Breed Details](breed-details.jpg)
 
 ## Development - Dave's notes to Dave
 ### dev machine build
