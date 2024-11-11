@@ -19,7 +19,10 @@ Getting honest feedback on unknown unknowns was also a secondary
 objective of working on this application, so flame away, friends!
 
 ## Try it out!
-Open index.html in your web browser. 
+Open index.html in your web browser.
+
+![The Breed List](breed-list.png)
+![The Breed Details](breed-details.png)
 
 ## Development - Dave's notes to Dave
 ### dev machine build
