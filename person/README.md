@@ -13,4 +13,5 @@ For this exercise we're assuming a very rigid list of fields for a Person:
 * Social Security Number
 * Marital Status
 * US Phone Number
+
 Making the list of fields extensible is not a priority. 
