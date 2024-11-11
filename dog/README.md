@@ -12,11 +12,13 @@ practice. Smells:
 1. It's one big God component, with state all stored in one big disorganized
    pile. For example, the BreedList page can access the BreedDetails
    page's pagination offset.
-1. No error handling. 
+1. More generally, the code chunks are outrageously large - I wouldn't
+   want to maintain this.  
+1. No error handling except what PureScript forces on me.
 
 
 Getting honest feedback on unknown unknowns was also a secondary
-objective of working on this application, so flame away, friends!
+objective of working on this application, so please go for it!
 
 ## Try it out!
 Open index.html in your web browser.

@@ -38,7 +38,12 @@ mapIndexBreedMap f bmap = map (uncurry f) alist
     alist = Map.toUnfoldable bmap
 
 type State =
-  { indexBreedMap :: Maybe IndexBreedMap,
+  { route :: Maybe Breed, -- 'Nothing' means the index page
+
+    -- Breed List page state
+    indexBreedMap :: Maybe IndexBreedMap,
+
+    -- Breed Details page state
 
     breedImages :: Map.Map Breed (Maybe (Array Url)),
     -- there are three possible states for a breedImages entry:
@@ -47,8 +52,7 @@ type State =
     -- 3. the key is not present, meaning it's never attempted to load a list of dog image urls.
     -- Obviously this long comment, and the fact that there's no encoding for http error, is a code smell.
     -- Hopefully this is good enough for now. 
-
-    route :: Maybe Breed, -- 'Nothing' means the index page
+    
     paginationOffset :: Int -- only used for BreedDetails pages
   }
 
@@ -74,7 +78,6 @@ component =
     , eval: H.mkEval $ H.defaultEval { handleAction = handleAction, initialize = Just IndexLoad }
     }
 
-
 initialState :: forall input. input -> State
 initialState _ = { indexBreedMap: Nothing,
                    breedImages: Map.empty,
@@ -85,7 +88,7 @@ initialState _ = { indexBreedMap: Nothing,
 render :: forall m. State -> H.ComponentHTML Action () m
 render st =
   case st.route of
-    Just breed ->
+    Just breed -> -- Breed Details page
       HH.div_ $
         [ HH.a [ HE.onClick \_ -> ViewIndex, HH.attr (HH.AttrName "href") "#" ] [ HH.text "all dog breeds" ],
           HH.h1_ [ HH.text breed ] ] <>
@@ -103,13 +106,13 @@ render st =
               imagesText =  if (length urls) == 1 then "image" else "images"
           Just Nothing -> [ HH.text "Loading image list..." ]
           Nothing -> [ HH.text "Not yet loading image list (seeing this seems like a bug)..." ]
-    Nothing ->
+    Nothing -> -- Breed List page
       HH.div_
         [ HH.p_
             [ HH.text $ if isNothing st.indexBreedMap then "Loading..." else "" ]
         , HH.div_
             case st.indexBreedMap of
-              Nothing -> [ HH.text "no st.result!"]
+              Nothing -> [ HH.text "Probable parse error loading list of dog breeds!"]
               Just bmap ->
                 [ HH.h1_
                     [ HH.text "Choose Your Dog Breed" ]
@@ -122,18 +125,15 @@ render st =
         colon [] = []
         colon _ = [HH.text ":"]
         breedLink s = HH.a [ HE.onClick \_ -> ViewBreed s, HH.attr (HH.AttrName "href") "#" ] [ HH.text s ]
-   
     
 bodyOf :: forall b rest. { body :: b | rest } -> b
 bodyOf x = x.body
 messageOf :: forall m rest. { message :: m | rest } -> m
 messageOf x = x.message
 
-
 handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action () output m Unit
 handleAction action = do
-  removeMe <- H.get
-  H.liftEffect $ log $ "handleAction triggered with: " <> show action <> " offset = " <> show removeMe.paginationOffset
+  H.liftEffect $ log $ "handleAction triggered with: " <> show action
   case action of
     PageDecrement -> do
       H.modify_ \s -> s { paginationOffset = s.paginationOffset - 20 }
@@ -166,32 +166,17 @@ handleAction action = do
         Just _ -> do
           H.liftEffect $ log $ "cache hit for " <> breed
     IndexLoad -> do
-      -- Log page load event
-      H.liftEffect $ log "IndexLoad action triggered"
-      
-      -- Log that the API request is being made
-      H.liftEffect $ log "Making API request to get breed list."
-      
-      -- Make the API request
+      H.liftEffect $ log "IndexLoad action triggered, making API request to get the breed list"
       response <- H.liftAff $ AX.get AXRF.string "https://dog.ceo/api/breeds/list/all"
-      
       let maybeResponse = hush response
-
-      -- Log the response
       H.liftEffect $ log $ "API response: " <> show maybeResponse
-
       let maybeBody :: Maybe String
           maybeBody = bodyOf <$> maybeResponse
           parsed :: Maybe { status :: String, message :: Map.Map Breed (Array Breed) }
           parsed = join (readJSON_ <$> maybeBody)
-
       H.liftEffect $ log $ "status: " <> show parsed
-
-      -- Update state based on the API response
       H.modify_ \s -> s
         { indexBreedMap = messageOf <$> parsed
         }
-      
-      -- Log completion of the action
       H.liftEffect $ log "IndexLoad action completed, indexBreedMap is a Just Map"
 
