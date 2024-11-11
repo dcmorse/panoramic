@@ -1,21 +1,21 @@
-module Person where
+module Demo where
 
 import Prelude
 import Data.Maybe (Maybe(..))
 import Data.Either (Either(..))
+import Data.Person
 import Data.SocialSecurityNumber
 import Data.PhoneNumber
-
+import Data.InkyString
+import Data.MaritalStatus
 
 jane :: Person
-jane = { firstName = "Jane",
-         lastName: "Doe",
-	 socialSecurityNumber: mkSocialSecurityNumber "123456789",
-         phoneNumber mkPhoneNumber: "3145851234",
-	 maritalStatus: Single
+jane = { firstName: mkInkyString "Jane"
+       , lastName: mkInkyString "Doe"
+       , socialSecurityNumber: mkSocialSecurityNumber "123456789"
+       , phoneNumber: mkPhoneNumber: "3145851234"
+       , maritalStatus: Single
        }
-
-
 
 -- EditablePerson is being imagined here for a classic web forms editor,
 -- with a human dilligently typing in data to it and POST requests
@@ -23,23 +23,39 @@ jane = { firstName = "Jane",
 -- client side validation with feedback, for example "First Name is
 -- Required".
 
-type EditablePerson = {
-  firstName            :: String
-, lastName             :: String
-, socialSecurityNumber :: String -- any string of characters
-, maritalStatus        :: Maybe MaritalStatus
-, phoneNumber          :: String -- any string of characters
-}
+type EditablePerson = { firstName            :: String
+                      , lastName             :: String
+                      , socialSecurityNumber :: String
+                      , maritalStatus        :: Maybe MaritalStatus
+                      , phoneNumber          :: String
+                      }
+
+mkPerson :: EditablePerson -> Maybe Person
+mkPerson ep = do
+  firstName <- mkInkyString ep.firstName
+  lastName <- mkInkyString ep.lastName
+  socialSecurityNumber <- mkSocialSecurityNumber ep.socialSecurityNumber
+  maritalStatus <- ep.maritalStatus
+  phoneNumber <- ep.phoneNumber
+  return { firstName, lastName, socialSecurityNumber, maritalStatus, phoneNumber }
+
 
 
 {- BASIC validation function
 mkPerson :: EditablePerson -> Maybe Person
 
-* For all string fields this would perhaps trim whitespace 
-  then reject if there's nothing left.  
-* For socialSecurityNumber and phoneNumber this
-  would trim whitespace and delegate to mkPhoneNumber and
-  mkSocialSecurityNumber. 
+* For socialSecurityNumber and phoneNumber this would delegate to
+  mkPhoneNumber and mkSocialSecurityNumber. Somewhere in that path
+  whitespace would be trimmed, either in the 'smart constructors' or
+  before. I'd lean towards the smart constructors. 
+
+* For the other string fields this would perhaps trim whitespace then
+  reject if there's nothing left. If I'm doing _any_ kind of validation
+  then shouldn't I go hog wild with the 'smart constructor' pattern
+  adopted in the ssn and phone number and adopt a NonBlankString newtype?
+  I don't have enough experience in this idiom to know the answer, so I
+  kept things as simple as I could for the name fields. 
+
 * For maritalStatus this would make sure it's not `Nothing`.
 
 I considered a `Either (Array FailReasons) Person` type, but discarded

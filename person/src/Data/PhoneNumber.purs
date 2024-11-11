@@ -11,7 +11,7 @@ import Data.Foldable (all)
 newtype PhoneNumber = PhoneNumber String
 
 mkPhoneNumber :: String -> Maybe PhoneNumber
-mkSocialSecurityNumber s =
+mkPhoneNumber s =
   -- In a real product I guess I'd work around all the phone number formats in common usage
   if length s == 10 && all isDigit (toCharArray s)
   then Just $ PhoneNumber s

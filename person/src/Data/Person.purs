@@ -1,16 +1,14 @@
-module Person where
+module Person (Person) where
 
-import Prelude
-import Data.Maybe (Maybe(..))
-import Data.Either (Either(..))
-import SocialSecurityNumber
-import PhoneNumber
+import Data.InkyString
+import Data.SocialSecurityNumber
+import Data.PhoneNumber
+import Data.MaritalStatus
 
-type Person = { 
-  firstName            :: String
-, lastName             :: String
-, socialSecurityNumber :: SocialSecurityNumber
-, maritalStatus        :: MaritalStatus
-, phoneNumber          :: PhoneNumber
-}
+type Person = { firstName            :: InkyString
+     	      , lastName             :: InkyString
+              , socialSecurityNumber :: SocialSecurityNumber
+              , maritalStatus        :: MaritalStatus
+              , phoneNumber          :: PhoneNumber
+              }
 

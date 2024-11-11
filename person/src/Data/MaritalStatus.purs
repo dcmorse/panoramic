@@ -1,5 +1,7 @@
 module Data.MaritalStatus (MaritalStatus(..)) where
 
+import Prelude
+
 data MaritalStatus = Single | Married
 derive instance eqMaritalStatus :: Eq MaritalStatus
 instance showMaritalStatus :: Show MaritalStatus where
