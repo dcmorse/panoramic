@@ -24,7 +24,6 @@ to generate this file without the comments in this block.
   , "ordered-collections"
   , "prelude"
   , "tuples"
-  , "web-events"
   , "yoga-json"
   ]
 , packages = ./packages.dhall

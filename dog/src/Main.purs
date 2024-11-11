@@ -39,9 +39,17 @@ mapIndexBreedMap f bmap = map (uncurry f) alist
 
 type State =
   { indexBreedMap :: Maybe IndexBreedMap,
-    breedImages :: Map.Map Breed (Maybe (Array Url)), -- if not in map: never requested. If in map with value Nothing: requested but loading, otherwise loaded
+
+    breedImages :: Map.Map Breed (Maybe (Array Url)),
+    -- there are three possible states for a breedImages entry:
+    -- 1. the key has a value of `Just (Array String)`, meaning it's loaded a list of zero or more dog image urls, hooray!
+    -- 2. the key has a value of `Nothing`, meaning we're waiting for the afore mentioned list to load
+    -- 3. the key is not present, meaning it's never attempted to load a list of dog image urls.
+    -- Obviously this long comment, and the fact that there's no encoding for http error, is a code smell.
+    -- Hopefully this is good enough for now. 
+
     route :: Maybe Breed, -- 'Nothing' means the index page
-    paginationOffset :: Int
+    paginationOffset :: Int -- only used for BreedDetails pages
   }
 
 data Action
